@@ -127,7 +127,7 @@ export async function POST(req: Request): Promise<NextResponse> {
                 });
               });
           } catch (e) {
-              console.warn("RTF parsing failed, using regex fallback.", e);
+              console.warn("RTF structued parser failed (likely encoding issue), switching to Regex fallback.");
               // Fallback: Robust Regex strip
               resumeText = rawRtf
                 .replace(/\\par[d]?\s*/g, "\n") // Paragraphs
