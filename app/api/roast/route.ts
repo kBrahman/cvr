@@ -218,18 +218,37 @@ export async function POST(req: Request): Promise<NextResponse> {
         resumeText = jsonResponse.extracted_text;
     }
 
-    // Track usage
+    // Save Roast & Track Usage
+    let roastId = null;
     try {
         const supabase = createClient(
           process.env.NEXT_PUBLIC_SUPABASE_URL!,
           process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
         );
-        await supabase.from('usage_events').insert({ event_type: 'roast' });
+        
+        // Parallel insertions for speed
+        const [roastInsert, usageInsert] = await Promise.all([
+            supabase.from('roasts').insert({
+                score: jsonResponse.score,
+                summary: jsonResponse.summary,
+                weaknesses: jsonResponse.weaknesses,
+                improvements: jsonResponse.improvements,
+                extracted_text: jsonResponse.extracted_text || resumeText || "", // Prefer explicitly extracted text
+                face_box: jsonResponse.face_box || null
+            }).select('id').single(),
+            supabase.from('usage_events').insert({ event_type: 'roast' })
+        ]);
+
+        if (roastInsert.data) {
+            roastId = roastInsert.data.id;
+        }
+
     } catch (e) {
-        console.error("Tracking error:", e);
+        console.error("Database error:", e);
+        // Don't fail the request if saving fails, but log it. The user still gets their result.
     }
     
-    return NextResponse.json({ ...jsonResponse, resumeText });
+    return NextResponse.json({ ...jsonResponse, resumeText, id: roastId });
 
   } catch (error) {
     console.error("Error roasting resume:", error);
