@@ -5,7 +5,7 @@ import { MoveRight, Zap, Shield, Search, CheckCircle2 } from "lucide-react";
 import { createClient } from "@supabase/supabase-js";
 
 export const revalidate = 60; // Revalidate every minute so counters update
-
+export const dynamic = 'force-dynamic';
 export default async function Home() {
   // Fetch real stats
   const supabase = createClient(
