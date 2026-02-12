@@ -63,9 +63,9 @@ export async function POST(req: Request) {
         "name": "Full Name",
         "title": "Professional Title",
         "contact": "Phone | Email 1 | Email 2 | Location",
-        "links": [ // EXTRACT GitHub, StackOverflow, LinkedIn, Kaggle ONLY. NO personal sites.
-          { "platform": "GitHub", "url": "https://github.com/..." },
-          { "platform": "Stack Overflow", "url": "..." }
+        "links": [ // EXTRACT Personal/Portfolio Websites, GitHub, StackOverflow, LinkedIn, Kaggle.
+          { "platform": "Personal Website", "url": "http://..." },
+          { "platform": "GitHub", "url": "https://github.com/..." }
         ]
       },
       "languages": ["Language 1", "Language 2"], // Extract languages if present
@@ -106,7 +106,11 @@ export async function POST(req: Request) {
     - Use strong action verbs.
     - CRITICAL: Do NOT invent, hallucinate, or infer ANY contact details. Only use contact info explicitly present in the source text.
     - CRITICAL: If multiple email addresses or phone numbers are present, INCLUDE ALL OF THEM (separated by ' / ' or ' | '). Do not arbitrarily select just one.
-    - CRITICAL: In 'header.links', ONLY include known professional platforms: GitHub, Stack Overflow, LinkedIn, Kaggle, GitLab. Do NOT include project demos or specific app links here.
+    - CRITICAL: In 'header.links', INCLUDE ONLY:
+      1. Known professional profiles: GitHub, LinkedIn, Stack Overflow, Kaggle, GitLab.
+      2. ONE Personal Website/Portfolio ONLY IF it looks like a personal domain (e.g. matches candidate's name like 'catalin.francu.com') OR is explicitly labeled as 'Web'/'Website'/'Portfolio' in the resume header.
+    - CRITICAL: Do NOT include company websites, project demos (e.g. nerdvana.ro, dignitas.ro), or random URLs in 'header.links'. These belong in 'experience' or 'projects'.
+    - CRITICAL: If a URL is 'nerdvana.ro', 'dignitas.ro', 'dexonline.ro', it is a PROJECT or COMPANY link. Do NOT put it in the header. Put it in the corresponding Experience item.
     - CRITICAL: Place relevant project/app links (e.g. Play Store, App Store, Live Demo) INSIDE the 'experience' or 'projects' item they belong to, using the 'links' array.
     - CRITICAL: If a section (Education, Experience, Skills, Projects) is missing from the source text, return an empty array []. Do NOT invent placeholder data like 'University (Information not provided)' or 'Coursework'.
     - CRITICAL: Preserve all Play Store / App Store / GitHub links found in job descriptions. Add them to the 'links' array for that experience.

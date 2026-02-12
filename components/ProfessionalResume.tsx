@@ -248,7 +248,7 @@ const ResumeRenderer = ({ data, layout, onEdit, isEditable }: { data: ResumeData
                     style={{ color: layout.type.includes('sidebar') ? (layout.colors.sidebarBg ? layout.colors.text : layout.colors.primary) : layout.colors.primary, borderColor: layout.colors.secondary }}>
                     Languages
                 </h2>
-                <div className="flex flex-wrap gap-2 text-sm text-gray-700">
+                <div className="flex flex-wrap gap-2 text-sm">
                     {data.languages.map((lang, i) => (
                         <span key={i} className="font-medium px-2 py-1 rounded border opacity-80" style={{ borderColor: layout.colors.secondary, color: layout.colors.text }}>{lang}</span>
                     ))}
@@ -304,7 +304,7 @@ const ResumeRenderer = ({ data, layout, onEdit, isEditable }: { data: ResumeData
                         )}
                      </div>
                      {photoUrl && (
-                        <img src={photoUrl} className="w-40 h-40 object-cover grayscale border-4 border-black block" alt="Profile" />
+                        <img src={photoUrl} className="w-40 h-40 object-cover grayscale border-4 block" style={{ borderColor: '#000000' }} alt="Profile" />
                      )}
                  </header>
              );
@@ -342,7 +342,7 @@ const ResumeRenderer = ({ data, layout, onEdit, isEditable }: { data: ResumeData
                 <div className="w-1/3 p-8 flex flex-col gap-6" style={{ backgroundColor: layout.colors.sidebarBg, color: layout.colors.sidebarText }}>
                     {layout.id === 'modern-slate' && photoUrl && (
                         <div className="w-full flex justify-center mb-2">
-                             <img src={photoUrl} className="w-32 h-32 rounded-full object-cover border-4 border-white/20 shadow-lg" alt="Profile" />
+                             <img src={photoUrl} className="w-32 h-32 rounded-full object-cover border-4 shadow-lg" style={{ borderColor: 'rgba(255,255,255,0.2)' }} alt="Profile" />
                         </div>
                     )}
                     {renderHeader()}
@@ -442,7 +442,7 @@ const ResumeRenderer = ({ data, layout, onEdit, isEditable }: { data: ResumeData
                  <div className="w-1/3 p-8 flex flex-col gap-6" style={{ backgroundColor: layout.colors.sidebarBg, color: layout.colors.sidebarText }}>
                       {layout.id === 'creative-mint' && photoUrl && (
                         <div className="w-full flex justify-center mb-6">
-                             <img src={photoUrl} className="w-32 h-32 rounded-full object-cover border-4 border-teal-100/50 shadow-lg" alt="Profile" />
+                             <img src={photoUrl} className="w-32 h-32 rounded-full object-cover border-4 shadow-lg" style={{ borderColor: 'rgba(204,251,241,0.5)' }} alt="Profile" />
                         </div>
                       )}
                        <div style={{ color: layout.colors.sidebarText }}>
@@ -660,14 +660,18 @@ export default function ProfessionalResume({ data, onDownload, price = "9.99" }:
   const handlePaymentSuccess = () => {
       setIsPaid(true);
       setShowPaymentModal(false);
-      if (pendingDownload) {
-          setTimeout(() => {
-              // Trigger download again with verification bypassed
+  };
+
+  // Trigger download after state update
+  React.useEffect(() => {
+      if (isPaid && pendingDownload) {
+          const timer = setTimeout(() => {
               handleDownload(pendingDownload.ref, pendingDownload.filename);
               setPendingDownload(null);
           }, 500);
+          return () => clearTimeout(timer);
       }
-  };
+  }, [isPaid, pendingDownload]);
 
   if (!data) return null;
 
@@ -746,14 +750,14 @@ export default function ProfessionalResume({ data, onDownload, price = "9.99" }:
                     }}>
                   
                   {/* WATERMARK OVERLAY */}
-                  <div data-html2canvas-ignore="true" className="absolute inset-0 z-50 pointer-events-none flex flex-col items-center justify-center opacity-10 overflow-hidden select-none" style={{ userSelect: 'none' }}>
-                      <div className="transform -rotate-45 text-black font-black text-9xl whitespace-nowrap">
+                  <div data-html2canvas-ignore="true" className="absolute inset-0 z-50 pointer-events-none flex flex-col items-center justify-center opacity-10 overflow-hidden select-none" style={{ userSelect: 'none', color: '#000000' }}>
+                      <div className="transform -rotate-45 font-black text-9xl whitespace-nowrap">
                           PREVIEW ONLY
                       </div>
-                      <div className="transform -rotate-45 text-black font-black text-9xl whitespace-nowrap mt-32">
+                      <div className="transform -rotate-45 font-black text-9xl whitespace-nowrap mt-32">
                           PAY TO DOWNLOAD
                       </div>
-                      <div className="transform -rotate-45 text-black font-black text-9xl whitespace-nowrap mt-32">
+                      <div className="transform -rotate-45 font-black text-9xl whitespace-nowrap mt-32">
                           PREVIEW ONLY
                       </div>
                   </div>
@@ -767,8 +771,8 @@ export default function ProfessionalResume({ data, onDownload, price = "9.99" }:
                             <>
                                 {resumeData.header.links.map((link, idx) => (
                                     <React.Fragment key={idx}>
-                                        <span className="text-gray-300">|</span>
-                                        <a href={link.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                                        <span className="text-gray-300" style={{ color: '#d1d5db' }}>|</span>
+                                        <a href={link.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline" style={{ color: '#2563eb' }}>
                                             {/* Show clean URL path or platform name? User asked for VALUES. e.g. github.com/user */}
                                             {link.url.replace(/^https?:\/\/(www\.)?/, '')}
                                         </a>
@@ -804,9 +808,9 @@ export default function ProfessionalResume({ data, onDownload, price = "9.99" }:
                     return (
                       <section className="mb-6 page-break-avoid">
                         <h2 className="text-sm font-bold uppercase tracking-widest text-gray-800 border-b border-gray-300 pb-1 mb-3" style={{ color: '#1f2937', borderColor: '#d1d5db' }}>Languages</h2>
-                        <div className="flex flex-wrap gap-2 text-sm text-gray-700">
+                        <div className="flex flex-wrap gap-2 text-sm text-gray-700" style={{ color: '#374151' }}>
                             {resumeData.languages.map((lang, i) => (
-                                <span key={i} className="font-medium px-2 py-1 bg-gray-50 rounded text-gray-600 border border-gray-200">{lang}</span>
+                                <span key={i} className="font-medium px-2 py-1 bg-gray-50 rounded text-gray-600 border border-gray-200" style={{ backgroundColor: '#f9fafb', color: '#4b5563', borderColor: '#e5e7eb' }}>{lang}</span>
                             ))}
                         </div>
                       </section>
@@ -848,11 +852,11 @@ export default function ProfessionalResume({ data, onDownload, price = "9.99" }:
                                             </div>
                                         ))}
                                         {job.links && job.links.length > 0 && (
-                                            <div className="mt-2 text-xs text-gray-600 pl-4">
+                                            <div className="mt-2 text-xs text-gray-600 pl-4" style={{ color: '#4b5563' }}>
                                                 {job.links.map((link, k) => (
                                                     <div key={k} className="flex items-center gap-1 mb-1">
-                                                        <span className="font-semibold text-gray-800">Link:</span>
-                                                        <a href={link} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline break-all hover:text-blue-800">
+                                                        <span className="font-semibold text-gray-800" style={{ color: '#1f2937' }}>Link:</span>
+                                                        <a href={link} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline break-all hover:text-blue-800" style={{ color: '#2563eb' }}>
                                                             {link}
                                                         </a>
                                                     </div>
@@ -1017,11 +1021,11 @@ export default function ProfessionalResume({ data, onDownload, price = "9.99" }:
                                 marginBottom: '2.5rem'
                             }}>
                             {/* Watermark for Custom Layouts */}
-                            <div data-html2canvas-ignore="true" className="absolute inset-0 z-50 pointer-events-none flex flex-col items-center justify-center opacity-10 overflow-hidden select-none" style={{ userSelect: 'none' }}>
-                                <div className="transform -rotate-45 text-black font-black text-9xl whitespace-nowrap">
+                            <div data-html2canvas-ignore="true" className="absolute inset-0 z-50 pointer-events-none flex flex-col items-center justify-center opacity-10 overflow-hidden select-none" style={{ userSelect: 'none', color: '#000000' }}>
+                                <div className="transform -rotate-45 font-black text-9xl whitespace-nowrap">
                                     PREVIEW ONLY
                                 </div>
-                                <div className="transform -rotate-45 text-black font-black text-9xl whitespace-nowrap mt-32">
+                                <div className="transform -rotate-45 font-black text-9xl whitespace-nowrap mt-32">
                                     PAY TO DOWNLOAD
                                 </div>
                             </div>

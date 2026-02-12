@@ -64,6 +64,18 @@ export default function PaymentModal({ isOpen, onClose, onSuccess, amount }: Pay
     const [mounted, setMounted] = useState(false);
     useEffect(() => setMounted(true), []);
 
+    // Prevent body scroll when modal is open
+    useEffect(() => {
+        if (isOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+        return () => {
+             document.body.style.overflow = 'unset';
+        };
+    }, [isOpen]);
+
     if (!isOpen || !mounted) return null;
 
     return createPortal(
@@ -81,9 +93,12 @@ export default function PaymentModal({ isOpen, onClose, onSuccess, amount }: Pay
                 backgroundColor: 'rgba(9, 9, 11, 0.95)' // Zinc-950 with 95% opacity
             }}
         >
-            <div className="bg-zinc-900 border border-zinc-700 rounded-2xl w-full max-w-md p-0 overflow-hidden shadow-2xl scale-100 relative">
+            <div 
+                className="bg-zinc-900 border border-zinc-700 rounded-2xl w-full max-w-md p-0 overflow-hidden shadow-2xl relative flex flex-col" 
+                style={{ maxHeight: '90vh' }}
+            >
                 {/* Header */}
-                <div className="bg-zinc-900 p-6 border-b border-zinc-800 flex justify-between items-start">
+                <div className="bg-zinc-900 p-6 border-b border-zinc-800 flex justify-between items-start shrink-0">
                     <div>
                         <h2 className="text-2xl font-bold text-white">Unlock Full Access</h2>
                         <p className="text-zinc-400 text-sm mt-1">Download your resume without watermarks.</p>
@@ -94,7 +109,7 @@ export default function PaymentModal({ isOpen, onClose, onSuccess, amount }: Pay
                 </div>
 
                 {/* Content */}
-                <div className="p-6">
+                <div className="p-6 overflow-y-auto custom-scrollbar flex-1 overscroll-contain min-h-0">
                     <div className="flex items-center justify-between mb-8 bg-zinc-800 p-4 rounded-xl border border-zinc-700">
                         <span className="font-semibold text-white">Total</span>
                         <span className="text-2xl font-bold text-blue-400">${amount}</span>
@@ -105,8 +120,9 @@ export default function PaymentModal({ isOpen, onClose, onSuccess, amount }: Pay
                     <PayPalScriptProvider options={{ 
                         clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "sb",
                         currency: "USD",
-                        intent: "capture", // Explicit intent
-                        components: "buttons", // Simplified
+                        intent: "capture",
+                        components: "buttons", 
+                        sdkBaseUrl: "https://www.sandbox.paypal.com/sdk/js", // Explicit Sandbox URL
                     }}>
                         <PayPalButtonWrapper amount={amount} onSuccess={onSuccess} />
                     </PayPalScriptProvider>

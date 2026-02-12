@@ -83,39 +83,63 @@ export async function POST(req: Request): Promise<NextResponse> {
 
     } else if (file.type === "text/plain") {
       resumeText = await file.text();
-    } else if (file.type === "application/rtf" || file.type === "text/rtf") {
+    } else if (
+      file.type === "application/rtf" || 
+      file.type === "text/rtf" || 
+      file.type === "application/x-rtf" ||
+      file.type === "text/richtext" ||
+      (file.name.toLowerCase().endsWith(".rtf"))
+    ) {
       const rawRtf = await file.text();
-      try {
-          // Parse RTF
-          // @ts-ignore
-          const rtfParser = require("rtf-parser");
-          resumeText = await new Promise((resolve, reject) => {
-            rtfParser.string(rawRtf, (err: any, doc: any) => {
-              if (err) reject(err);
-              else {
-                 // Helper to extract text from AST
-                 const extractText = (node: any): string => {
-                    if (Array.isArray(node)) return node.map(extractText).join("");
-                    if (node.text) return node.text;
-                    if (node.content) return extractText(node.content);
-                    return "";
-                 };
-                 resolve(extractText(doc.content || []));
-              }
-            });
-          });
-      } catch (e) {
-          console.warn("RTF parsing failed, using regex fallback.");
-          // Fallback: Robust Regex strip
+      
+      // For large RTF files (>500KB), skip the parser and use regex to avoid OOM/Timeouts
+      // 1.6MB is too large for the synchronous rtf-parser in this context
+      if (file.size > 500 * 1024) {
+          console.log("RTF file too large for parser, using regex fallback.");
           resumeText = rawRtf
-            .replace(/\\par[d]?\s*/g, "\n") // Paragraphs
-            .replace(/\\line\s*/g, "\n")    // Line breaks
-            .replace(/\\row\s*/g, "\n")     // Table rows
-            .replace(/\\'([0-9a-fA-F]{2})/g, (match, hex) => String.fromCharCode(parseInt(hex, 16))) // Decode Hex
-            .replace(/\\[a-z]+\d* ?/g, "")  // Remove control words
-            .replace(/[{}]/g, "")           // Remove braces
-            .split('\n').filter(line => line.trim().length > 0).join('\n') // Clean empty lines
+            .replace(/\\par[d]?\s*/g, "\n")
+            .replace(/\\line\s*/g, "\n")
+            .replace(/\\row\s*/g, "\n")
+            .replace(/\\'([0-9a-fA-F]{2})/g, (match, hex) => String.fromCharCode(parseInt(hex, 16)))
+            .replace(/\\u([0-9]+)\?/g, (match, code) => String.fromCharCode(parseInt(code))) // Unicode
+            .replace(/[{}]/g, "")
+            .replace(/\\[a-z]+\d* ?/g, "")
+            .split('\n').filter(line => line.trim().length > 0).join('\n')
             .trim();
+      } else {
+          try {
+              // Parse RTF
+              // @ts-ignore
+              const rtfParser = require("rtf-parser");
+              resumeText = await new Promise((resolve, reject) => {
+                rtfParser.string(rawRtf, (err: any, doc: any) => {
+                  if (err) reject(err);
+                  else {
+                     // Helper to extract text from AST
+                     const extractText = (node: any): string => {
+                        if (Array.isArray(node)) return node.map(extractText).join("");
+                        if (node.text) return node.text;
+                        if (node.content) return extractText(node.content);
+                        return "";
+                     };
+                     resolve(extractText(doc.content || []));
+                  }
+                });
+              });
+          } catch (e) {
+              console.warn("RTF parsing failed, using regex fallback.", e);
+              // Fallback: Robust Regex strip
+              resumeText = rawRtf
+                .replace(/\\par[d]?\s*/g, "\n") // Paragraphs
+                .replace(/\\line\s*/g, "\n")    // Line breaks
+                .replace(/\\row\s*/g, "\n")     // Table rows
+                .replace(/\\'([0-9a-fA-F]{2})/g, (match, hex) => String.fromCharCode(parseInt(hex, 16))) // Decode Hex
+                .replace(/\\u([0-9]+)\?/g, (match, code) => String.fromCharCode(parseInt(code))) // Unicode
+                .replace(/[{}]/g, "")           // Remove braces
+                .replace(/\\[a-z]+\d* ?/g, "")  // Remove control words
+                .split('\n').filter(line => line.trim().length > 0).join('\n') // Clean empty lines
+                .trim();
+          }
       }
     } else if (file.type === "application/vnd.oasis.opendocument.text") {
       const arrayBuffer = await file.arrayBuffer();
@@ -173,6 +197,11 @@ export async function POST(req: Request): Promise<NextResponse> {
       ];
     } else {
       return NextResponse.json({ error: "Unsupported file type" }, { status: 400 });
+    }
+
+    // Validate extracted text
+    if (!resumeText && !base64Image) {
+        return NextResponse.json({ error: "Could not extract any text from this file. Please try a different format (PDF/DOCX) or copy-paste the content." }, { status: 400 });
     }
 
     // Call Gemini API with Fallback
