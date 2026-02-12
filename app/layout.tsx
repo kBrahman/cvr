@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Resume Roaster",
   description: "AI-powered resume analysis and improvement.",
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://resumeroaster.app" || "http://localhost:3000"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://cv.brahman.top"),
 };
 
 export default function RootLayout({
