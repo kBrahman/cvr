@@ -49,6 +49,10 @@ export async function generateMetadata(
       card: 'summary_large_image',
       title: `Resume Roast Score: ${roast.score}/100`,
       description: roast.summary,
+    },
+    robots: {
+      index: false,
+      follow: false,
     }
   }
 }

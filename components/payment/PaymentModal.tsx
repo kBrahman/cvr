@@ -117,12 +117,16 @@ export default function PaymentModal({ isOpen, onClose, onSuccess, amount }: Pay
 
                     {/* PayPal Provider */}
                     {/* Ideally Client ID comes from env */}
+                    {/* PayPal Provider with Dynamic Environment Switching */}
                     <PayPalScriptProvider options={{ 
                         clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "sb",
                         currency: "USD",
                         intent: "capture",
                         components: "buttons", 
-                        sdkBaseUrl: "https://www.sandbox.paypal.com/sdk/js", // Explicit Sandbox URL
+                        // Only force sandbox URL if NOT production. Production (AUd7r...) uses default.
+                        ...((process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "").startsWith("AUd7r") 
+                            ? {} 
+                            : { sdkBaseUrl: "https://www.sandbox.paypal.com/sdk/js" })
                     }}>
                         <PayPalButtonWrapper amount={amount} onSuccess={onSuccess} />
                     </PayPalScriptProvider>

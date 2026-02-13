@@ -8,6 +8,7 @@ import { twMerge } from "tailwind-merge";
 
 import ProfessionalResume from "./ProfessionalResume";
 import RoastResultCard from "./RoastResultCard";
+import PaymentModal from "./payment/PaymentModal";
 
 function cn(...inputs: (string | undefined | null | false)[]) {
   return twMerge(clsx(inputs));
@@ -22,6 +23,7 @@ export default function ResumeRoaster({ price = "9.99" }: { price?: string }) {
   const [fixedContent, setFixedContent] = useState<any>(null);
   const [fixing, setFixing] = useState(false);
   const [extractedPhoto, setExtractedPhoto] = useState<string | null>(null);
+  const [isPaymentOpen, setIsPaymentOpen] = useState(false);
   const resultsRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -157,10 +159,13 @@ export default function ResumeRoaster({ price = "9.99" }: { price?: string }) {
   };
 
   const handleDownload = () => {
-    if (confirm(`Wait! To download this professionally formatted PDF, you need to unlock the full 'Resume Rescue' package for just $${price}.\n\nClick OK to proceed to payment.`)) {
-        // Replace with actual Stripe link provided by user later
-        window.open('https://buy.stripe.com/test_12345', '_blank'); 
-    }
+    setIsPaymentOpen(true);
+  };
+
+  const handlePaymentSuccess = () => {
+    setIsPaymentOpen(false);
+    alert("Payment verified! Your download will begin shortly.");
+    // In a real app, this would trigger the actual PDF generation/download
   };
 
   return (
@@ -286,6 +291,13 @@ export default function ResumeRoaster({ price = "9.99" }: { price?: string }) {
                 />
         </div>
     )}
+    
+    <PaymentModal 
+        isOpen={isPaymentOpen}
+        onClose={() => setIsPaymentOpen(false)}
+        onSuccess={handlePaymentSuccess}
+        amount={price}
+    />
     </>
   );
 }
