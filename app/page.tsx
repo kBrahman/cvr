@@ -1,6 +1,7 @@
 import Image from "next/image";
 import ResumeRoaster from "@/components/ResumeRoaster";
 import Navbar from "@/components/Navbar";
+import MobileWarning from "@/components/MobileWarning";
 import { MoveRight, Zap, Shield, Search, CheckCircle2 } from "lucide-react";
 import { createClient } from "@supabase/supabase-js";
 
@@ -55,6 +56,7 @@ export default async function Home() {
       `}</style>
 
       {/* Background Gradients */}
+      <MobileWarning />
       <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-primary/10 rounded-full blur-[120px] pointer-events-none -z-10" />
       <div className="fixed bottom-0 right-0 w-[800px] h-[600px] bg-secondary/5 rounded-full blur-[100px] pointer-events-none -z-10" />
 
