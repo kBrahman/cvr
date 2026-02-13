@@ -202,7 +202,7 @@ export default function ResumeRoaster({ price = "9.99" }: { price?: string }) {
               id="file-upload"
               ref={fileInputRef}
               type="file" 
-              accept=".pdf,.png,.jpg,.jpeg,.avif,.docx,.txt,.rtf,.odt"
+              accept=".pdf,.png,.jpg,.jpeg,.avif,.webp,.docx,.txt,.rtf,.odt"
               className="hidden"
               onChange={handleFileChange}
             />
@@ -232,7 +232,7 @@ export default function ResumeRoaster({ price = "9.99" }: { price?: string }) {
                 </div>
                 <div>
                   <p className="text-lg font-bold text-white mb-1">Click to upload or drag and drop</p>
-                  <p className="text-sm text-zinc-500">PDF, DOCX, ODT, TXT, RTF, PNG, JPG, AVIF (Max 5MB)</p>
+                  <p className="text-sm text-zinc-500">PDF, DOCX, ODT, TXT, RTF, PNG, JPG, WEBP, AVIF (Max 5MB)</p>
                 </div>
               </div>
             )}

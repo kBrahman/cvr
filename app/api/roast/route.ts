@@ -185,12 +185,13 @@ export async function POST(req: Request): Promise<NextResponse> {
         resumeText.substring(0, 20000) // Gemini has large context context, but let's be safe
       ];
     } else if (base64Image) { // Use the stored base64Image
+      const mimeType = file.type === "image/webp" ? "image/webp" : file.type;
       promptParts = [
         systemPrompt,
         {
           inlineData: {
             data: base64Image,
-            mimeType: file.type
+            mimeType: mimeType
           }
         },
         "Roast this resume image. CRITICAL: You must also extract all readable text from the image and include it in the JSON output as 'extracted_text'. ALSO: Detect the candidate's profile photo face bounding box. Return it as 'face_box': [ymin, xmin, ymax, xmax] using 0-1000 normalized coordinates. If no photo is found, set face_box to null."
