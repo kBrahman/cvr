@@ -121,10 +121,24 @@ export async function POST(req: Request) {
     - CRITICAL: Do NOT include company websites, project demos (e.g. nerdvana.ro, dignitas.ro), or random URLs in 'header.links'. These belong in 'experience' or 'projects'.
     - CRITICAL: If a URL is 'nerdvana.ro', 'dignitas.ro', 'dexonline.ro', it is a PROJECT or COMPANY link. Do NOT put it in the header. Put it in the corresponding Experience item.
     - CRITICAL: Place relevant project/app links (e.g. Play Store, App Store, Live Demo) INSIDE the 'experience' or 'projects' item they belong to, using the 'links' array.
-    - CRITICAL: If a section (Education, Experience, Skills, Projects) is missing from the source text, return an empty array []. Do NOT invent placeholder data like 'University (Information not provided)' or 'Coursework'.
+    - CRITICAL: If a section (Education, Experience, Skills) is missing from the source text, return an empty array []. Do NOT invent placeholder data like 'University (Information not provided)' or 'Coursework'.
+    - CRITICAL: HOWEVER, if a section contains REDACTED/BLACKED-OUT information (e.g. '[Redacted]' or similar placeholders in source text), include the section with '[Redacted]' or generic placeholders (e.g. 'University name [Redacted]'). Do NOT omit it.
     - CRITICAL: Preserve all Play Store / App Store / GitHub links found in job descriptions. Add them to the 'links' array for that experience.
     - CRITICAL: Order 'experience' items by date, starting with the MOST RECENT (Current/Present) job first, and working backwards. Do NOT return them in random or chronological order.
-    - CRITICAL: EXTRACT 'PROJECTS' SECTION IF PRESENT. If the resume has a 'Projects' section, you MUST populate the 'projects' array. Do not ignore it.
+    - CRITICAL: YOU MUST INCLUDE EVERY SINGLE EXPERIENCE ITEM FOUND IN THE SOURCE TEXT. If the source lists 2 jobs, return 2 jobs. If it lists 3, return 3. Do NOT omit older jobs unless they are irrelevant >15 years ago.
+    - CRITICAL: EXTRACT 'PROJECTS' SECTION IF PRESENT. This includes 'Solo Projects', 'Side Projects', 'Technical Projects'. You MUST extract all items and place them in the 'projects' array. Do NOT skip them.
+    - CRITICAL: If the user lists 'Solo Projects', treat them as full 'Projects'. Include name, description, and key tech stack.
+    - CRITICAL: APPLY IMPROVEMENTS: If an 'Actionable Fix' or 'Weakness' critique specifically suggests a change (e.g. 'rephrase X as Y'), YOU MUST IMPLEMENT THAT CHANGE in the generated JSON content.
+    - CRITICAL: DETERMINE SECTION ORDER. You must output a 'sectionOrder' array of strings.
+      - If the candidate is a STUDENT or Recent Grad (e.g. grad year > 2023) or has High GPA (>3.5), put "education" FIRST.
+      - If the candidate is an EXPERIENCED professional (>2 years), put "experience" FIRST.
+      - If the candidate relies on portfolios (e.g. designer/dev), put "projects" or "skills" higher.
+      - The array must assume 'header' and 'summary' are already at the top.
+      - valid values: "experience", "education", "projects", "skills", "languages".
+      - Example 1 (Student): ["education", "skills", "projects", "experience", "languages"]
+      - Example 2 (Senior Dev): ["experience", "skills", "projects", "education", "languages"]
+    - CRITICAL: 'languages' array MUST contain HUMAN SPOKEN LANGUAGES ONLY (e.g. English, Spanish, French).
+    - CRITICAL: DO NOT put programming languages (Python, Java, C++, etc.) in 'languages'. Put them in 'skills'.
     - Do NOT include markdown code blocks (like \`\`\`json). Just return the raw JSON string.
     `;
 

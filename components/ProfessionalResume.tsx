@@ -34,6 +34,7 @@ interface ResumeData {
     link?: string;
   }[];
   photo?: string;
+  sectionOrder?: string[];
 }
 
 // Layout Configuration Types
@@ -240,6 +241,36 @@ const ResumeRenderer = ({ data, layout, onEdit, isEditable }: { data: ResumeData
         </section>
     )};
 
+    const renderProjects = () => {
+        if (!data.projects || data.projects.length === 0) return null;
+        return (
+            <section className="mb-6">
+                <h2 className="text-sm font-bold uppercase tracking-widest border-b pb-1 mb-3" 
+                    style={{ color: layout.type.includes('sidebar') ? (layout.colors.sidebarBg ? layout.colors.text : layout.colors.primary) : layout.colors.primary, borderColor: layout.colors.secondary }}>
+                    Projects
+                </h2>
+                <div className="space-y-4">
+                    {data.projects.map((proj, i) => (
+                        <div key={i} className="page-break-avoid">
+                            <div className="flex justify-between items-baseline mb-1">
+                                <h3 className="font-bold" style={{ color: layout.colors.text }}>{proj.name}</h3>
+                            </div>
+                            <p className="text-sm leading-relaxed opacity-90 mb-2" style={{ color: layout.colors.text }}>{proj.description}</p>
+                            {proj.link && (
+                                <div className="flex items-center gap-1 text-xs opacity-80">
+                                    <span className="font-semibold" style={{ color: layout.colors.text }}>Link:</span>
+                                    <a href={proj.link} target="_blank" rel="noopener noreferrer" className="underline break-all hover:opacity-75" style={{ color: layout.type === 'sidebar-left' ? layout.colors.sidebarBg : layout.colors.primary }}>
+                                        {proj.link}
+                                    </a>
+                                </div>
+                            )}
+                        </div>
+                    ))}
+                </div>
+            </section>
+        );
+    };
+
     const renderLanguages = () => {
         if (!data.languages || data.languages.length === 0) return null;
         return (
@@ -425,6 +456,7 @@ const ResumeRenderer = ({ data, layout, onEdit, isEditable }: { data: ResumeData
                      </section>
 
                      {renderExperience()}
+                     {renderProjects()}
                 </div>
             </div>
         )
@@ -438,6 +470,7 @@ const ResumeRenderer = ({ data, layout, onEdit, isEditable }: { data: ResumeData
                      {renderHeader()}
                      {renderSummary()}
                      {renderExperience()}
+                     {renderProjects()}
                 </div>
                  <div className="w-1/3 p-8 flex flex-col gap-6" style={{ backgroundColor: layout.colors.sidebarBg, color: layout.colors.sidebarText }}>
                       {layout.id === 'creative-mint' && photoUrl && (
@@ -513,14 +546,30 @@ const ResumeRenderer = ({ data, layout, onEdit, isEditable }: { data: ResumeData
     }
 
     // Single Column
+    const dynamicOrder = data.sectionOrder?.filter(key => 
+        ['experience', 'education', 'projects', 'skills', 'languages'].includes(key)
+    ) || ['skills', 'experience', 'projects', 'education', 'languages']; // Default fallback
+
+    const renderSection = (key: string) => {
+        switch(key) {
+            case 'experience': return renderExperience();
+            case 'education': return renderEducation();
+            case 'projects': return renderProjects();
+            case 'skills': return renderSkills();
+            case 'languages': return renderLanguages();
+            default: return null;
+        }
+    };
+
     return (
         <div className={`p-[10mm] w-full h-auto min-h-[297mm] ${layout.font}`} style={{ backgroundColor: layout.colors.bg }}>
             {renderHeader()}
             {renderSummary()}
-            {renderSkills()}
-            {renderLanguages()}
-            {renderExperience()}
-            {renderEducation()}
+            {dynamicOrder.map(key => (
+                <React.Fragment key={key}>
+                    {renderSection(key)}
+                </React.Fragment>
+            ))}
         </div>
     );
 }
@@ -892,6 +941,31 @@ export default function ProfessionalResume({ data, onDownload, price = "9.99" }:
                                         <p className="text-sm text-gray-600" style={{ color: '#4b5563' }}>{edu.degree}</p>
                                     </div>
                                     <span className="text-xs font-medium text-gray-500" style={{ color: '#6b7280' }}>{edu.year}</span>
+                                </div>
+                            ))}
+                        </div>
+                      </section>
+                    );
+                  })()}
+
+                  {(() => {
+                    if (!resumeData.projects || resumeData.projects.length === 0) return null;
+                    return (
+                      <section className="mb-6 page-break-avoid">
+                        <h2 className="text-sm font-bold uppercase tracking-widest text-gray-800 border-b border-gray-300 pb-1 mb-3" style={{ color: '#1f2937', borderColor: '#d1d5db' }}>Projects</h2>
+                        <div className="space-y-4">
+                            {resumeData.projects.map((proj, i) => (
+                                <div key={i} className="page-break-avoid">
+                                    <h3 className="font-bold text-gray-900 mb-1" style={{ color: '#111827' }}>{proj.name}</h3>
+                                    <p className="text-sm text-gray-700 leading-relaxed mb-2" style={{ color: '#374151' }}>{proj.description}</p>
+                                    {proj.link && (
+                                        <div className="flex items-center gap-1 text-xs text-blue-600">
+                                            <span className="font-semibold text-gray-800" style={{ color: '#1f2937' }}>Link:</span>
+                                            <a href={proj.link} target="_blank" rel="noopener noreferrer" className="underline break-all hover:text-blue-800" style={{ color: '#2563eb' }}>
+                                                {proj.link}
+                                            </a>
+                                        </div>
+                                    )}
                                 </div>
                             ))}
                         </div>

@@ -242,6 +242,37 @@ export default function EditDrawer({ isOpen, onClose, data, onUpdate }: EditDraw
                          ))}
                     </div>
 
+                    {/* Education */}
+                     <div className="space-y-4">
+                         <h3 className="text-sm font-bold uppercase tracking-wider text-zinc-500 flex justify-between items-center">
+                            Education
+                         </h3>
+                         {formData.education.map((edu, i) => (
+                             <div key={i} className="bg-zinc-800/50 p-4 rounded-xl border border-zinc-700 space-y-3">
+                                 <div className="grid grid-cols-2 gap-2">
+                                     <input 
+                                        value={edu.degree}
+                                        onChange={(e) => handleNestedChange('education', i, 'degree', e.target.value)}
+                                        className="w-full bg-zinc-900 border-zinc-700 rounded px-2 py-1 text-sm text-white font-bold"
+                                        placeholder="Degree"
+                                     />
+                                      <input 
+                                        value={edu.school}
+                                        onChange={(e) => handleNestedChange('education', i, 'school', e.target.value)}
+                                        className="w-full bg-zinc-900 border-zinc-700 rounded px-2 py-1 text-sm text-white"
+                                        placeholder="School"
+                                     />
+                                 </div>
+                                  <input 
+                                    value={edu.year}
+                                    onChange={(e) => handleNestedChange('education', i, 'year', e.target.value)}
+                                    className="w-full bg-zinc-900 border-zinc-700 rounded px-2 py-1 text-sm text-white"
+                                    placeholder="Year"
+                                 />
+                             </div>
+                         ))}
+                    </div>
+
                     {/* Footer Tip */}
                     <div className="bg-blue-500/10 border border-blue-500/20 p-4 rounded-xl flex gap-3 items-start">
                         <AlertCircle className="w-5 h-5 text-blue-400 shrink-0 mt-0.5" />

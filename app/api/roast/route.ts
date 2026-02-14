@@ -51,6 +51,8 @@ export async function POST(req: Request): Promise<NextResponse> {
     
     Tone: Harsh, funny, witty, but ultimately helpful.
     
+    CRITICAL INSTRUCTION: IGNORE all file encoding artifacts (RTF tags, XML structures, weird characters). Do NOT mention "RTF code", "XML junk", "raw internal formatting", or "ATS parsing issues due to file format" in the weaknesses. WEAKNESSES MUST BE ABOUT THE VISIBLE CONTENT (wording, layout choices, lack of metrics, bad grammar, etc). If the text looks messy due to extraction, assume it's a parsing artifact and judge the underlying content instead.
+    
     Output JSON format ONLY (no markdown backticks):
     {
       "score": number (0-100),
@@ -215,7 +217,7 @@ export async function POST(req: Request): Promise<NextResponse> {
             mimeType: fileType // Use the (potentially converted) MIME type
           }
         },
-        "Roast this resume image. CRITICAL: You must READ THE ENTIRE IMAGE from top to bottom. Do not miss ANY section, especially 'Experience', 'Education', and 'Skills'. Extraction must be complete. INCLUDE extracted text in 'extracted_text'. ALSO: Detect the candidate's profile photo face bounding box as 'face_box': [ymin, xmin, ymax, xmax] (0-1000). If no photo, set face_box to null. NOTE: When analyzing experience, pay closest attention to the MOST RECENT job."
+        "TASK 1: DATA EXTRACTION (CRITICAL). You are acting as an OCR machine. extract ALL text from the image VERBATIM into the 'extracted_text' field. Do NOT summarize. Do NOT skip sections. You MUST include:\n- 'Experience' (ALL jobs)\n- 'Solo Projects', 'Side Projects', 'Projects' (ALL content including bullet points)\n- 'Education' (even if redacted)\n- 'Skills'\n\nTASK 2: ROAST THE RESUME.\nAnalyze the content you just extracted. ...\n\nNOTE: If you see large black bars/redacted regions, treat them as text content '[Redacted]'. ...\n\nALSO: Detect the candidate's profile photo..."
       ];
     } else {
       return NextResponse.json({ error: "Unsupported file type" }, { status: 400 });
