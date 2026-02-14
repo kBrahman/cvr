@@ -1,4 +1,6 @@
 import Image from "next/image";
+import packageInfo from "@/package.json";
+
 import ResumeRoaster from "@/components/ResumeRoaster";
 import Navbar from "@/components/Navbar";
 import MobileWarning from "@/components/MobileWarning";
@@ -225,7 +227,7 @@ export default async function Home() {
 
       {/* Footer */}
       <footer className="border-t border-zinc-900 py-12 px-6 bg-black text-center text-zinc-500 text-sm">
-        <p>&copy; 2026 ResumeRoast. All rights reserved.</p>
+        <p>&copy; 2026 ResumeRoast v{packageInfo.version}. All rights reserved.</p>
       </footer>
     </main>
   );
