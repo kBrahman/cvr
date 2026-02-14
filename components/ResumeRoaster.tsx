@@ -133,7 +133,9 @@ export default function ResumeRoaster({ price = "9.99" }: { price?: string }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
           resumeText,
-          weaknesses: result?.weaknesses 
+          weaknesses: result?.weaknesses,
+          improvements: result?.improvements,
+          summary: result?.summary 
         }),
       });
       

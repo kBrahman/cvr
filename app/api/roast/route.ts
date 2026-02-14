@@ -41,6 +41,7 @@ export async function POST(req: Request): Promise<NextResponse> {
     let promptParts: any[] = [];
     let resumeText = "";
     let base64Image = "";
+    let fileType = file ? file.type : "";
 
     const systemPrompt = `You are a brutal, sarcastic, but highly knowledgeable senior recruiter. Your job is to 'roast' resumes.
     
@@ -171,7 +172,28 @@ export async function POST(req: Request): Promise<NextResponse> {
 
     } else if (file.type.startsWith("image/")) {
       const arrayBuffer = await file.arrayBuffer();
-      const buffer = Buffer.from(arrayBuffer);
+      let buffer = Buffer.from(arrayBuffer);
+      
+      // Optimize and standardize image to PNG using sharp
+      // This fixes issues with some WEBP/AVIF files not being fully read by Gemini
+      try {
+        const sharp = require('sharp');
+        // Resize if too large (widest standard monitor is usually enough for OCR)
+        // and convert to PNG to ensure compatibility
+        buffer = await sharp(buffer)
+            .resize(2000, 2000, { // Cap dimensions to avoid massive images, prompt aspect ratio preservation
+                fit: 'inside',
+                withoutEnlargement: true
+            })
+            .png({ quality: 100 })
+            .toBuffer();
+            
+        fileType = "image/png"; // Force MIME type to PNG
+      } catch (e) {
+        console.error("Sharp image conversion failed, failing back to original:", e);
+        // Fallback to original
+      }
+      
       base64Image = buffer.toString("base64");
     } else {
       return NextResponse.json({ error: "Unsupported file type. Supported types are PDF, DOCX, ODT, TXT, RTF, and common image formats." }, { status: 400 });
@@ -185,16 +207,15 @@ export async function POST(req: Request): Promise<NextResponse> {
         resumeText.substring(0, 20000) // Gemini has large context context, but let's be safe
       ];
     } else if (base64Image) { // Use the stored base64Image
-      const mimeType = file.type === "image/webp" ? "image/webp" : file.type;
       promptParts = [
         systemPrompt,
         {
           inlineData: {
             data: base64Image,
-            mimeType: mimeType
+            mimeType: fileType // Use the (potentially converted) MIME type
           }
         },
-        "Roast this resume image. CRITICAL: You must also extract all readable text from the image and include it in the JSON output as 'extracted_text'. ALSO: Detect the candidate's profile photo face bounding box. Return it as 'face_box': [ymin, xmin, ymax, xmax] using 0-1000 normalized coordinates. If no photo is found, set face_box to null."
+        "Roast this resume image. CRITICAL: You must READ THE ENTIRE IMAGE from top to bottom. Do not miss ANY section, especially 'Experience', 'Education', and 'Skills'. Extraction must be complete. INCLUDE extracted text in 'extracted_text'. ALSO: Detect the candidate's profile photo face bounding box as 'face_box': [ymin, xmin, ymax, xmax] (0-1000). If no photo, set face_box to null. NOTE: When analyzing experience, pay closest attention to the MOST RECENT job."
       ];
     } else {
       return NextResponse.json({ error: "Unsupported file type" }, { status: 400 });

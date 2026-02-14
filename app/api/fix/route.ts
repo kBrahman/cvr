@@ -8,7 +8,7 @@ const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
 
 export async function POST(req: Request) {
   try {
-    const { resumeText, weaknesses } = await req.json();
+    const { resumeText, weaknesses, improvements, summary } = await req.json();
 
     if (!resumeText) {
       return NextResponse.json({ error: "No resume text provided" }, { status: 400 });
@@ -87,7 +87,7 @@ export async function POST(req: Request) {
           "year": "Year"
         }
       ],
-      "projects": [ // Optional, include if present in source
+      "projects": [ // VERY IMPORTANT: Extract ALL projects mentioned in the text.
         {
           "name": "Project Name",
           "description": "Brief description of technologies and impact."
@@ -95,8 +95,17 @@ export async function POST(req: Request) {
       ]
     }
 
-    Specific Focus Areas (based on critique):
-    ${weaknesses ? JSON.stringify(weaknesses) : "General improvements"}
+    CONTEXT FOR IMPROVEMENT:
+    The user's resume has been critiqued with the following feedback. You MUST address these points in your rewrite:
+    
+    WEAKNESSES IDENTIFIED:
+    ${weaknesses ? JSON.stringify(weaknesses, null, 2) : "None identified."}
+
+    ACTIONABLE FIXES TO IMPLEMENT:
+    ${improvements ? JSON.stringify(improvements, null, 2) : "General professional polish."}
+    
+    SUMMARY OF CRITIQUE:
+    ${summary || "No summary provided."}
 
     Original Resume Text:
     ${resumeText.substring(0, 25000)}
@@ -114,6 +123,8 @@ export async function POST(req: Request) {
     - CRITICAL: Place relevant project/app links (e.g. Play Store, App Store, Live Demo) INSIDE the 'experience' or 'projects' item they belong to, using the 'links' array.
     - CRITICAL: If a section (Education, Experience, Skills, Projects) is missing from the source text, return an empty array []. Do NOT invent placeholder data like 'University (Information not provided)' or 'Coursework'.
     - CRITICAL: Preserve all Play Store / App Store / GitHub links found in job descriptions. Add them to the 'links' array for that experience.
+    - CRITICAL: Order 'experience' items by date, starting with the MOST RECENT (Current/Present) job first, and working backwards. Do NOT return them in random or chronological order.
+    - CRITICAL: EXTRACT 'PROJECTS' SECTION IF PRESENT. If the resume has a 'Projects' section, you MUST populate the 'projects' array. Do not ignore it.
     - Do NOT include markdown code blocks (like \`\`\`json). Just return the raw JSON string.
     `;
 
