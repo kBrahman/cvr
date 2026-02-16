@@ -144,20 +144,29 @@ const ResumeRenderer = ({ data, layout, onEdit, isEditable }: { data: ResumeData
     const renderSkills = () => {
         const validSkills = data.skills?.filter(skill => skill && skill.trim().length > 0 && skill !== "Skill 1");
         if (!validSkills || validSkills.length === 0) return null;
+
+        const isClassicLayout = ['executive-classic', 'elegant-serif'].includes(layout.id);
+
         return (
          <section className="mb-6">
             <h2 className="text-sm font-bold uppercase tracking-widest border-b pb-1 mb-3" 
                 style={{ color: layout.type.includes('sidebar') ? (layout.colors.sidebarBg ? layout.colors.text : layout.colors.primary) : layout.colors.primary, borderColor: layout.colors.secondary }}>
                 Skills
             </h2>
-            <div className="flex flex-wrap gap-2">
-                {validSkills.map((skill, i) => (
-                    <span key={i} className="px-2 py-1 rounded text-xs font-semibold uppercase opacity-90" 
-                          style={{ backgroundColor: layout.colors.secondary + '20', color: layout.colors.text }}>
-                        {skill}
-                    </span>
-                ))}
-            </div>
+            {isClassicLayout ? (
+                <div className="text-sm leading-relaxed font-medium" style={{ color: layout.colors.text }}>
+                    {validSkills.join("  •  ")}
+                </div>
+            ) : (
+                <div className="flex flex-wrap gap-2">
+                    {validSkills.map((skill, i) => (
+                        <span key={i} className="inline-block px-2 h-[22px] leading-[22px] rounded text-xs font-semibold uppercase opacity-90 align-middle tracking-wide" 
+                              style={{ backgroundColor: layout.colors.secondary + '20', color: layout.colors.text }}>
+                            {skill}
+                        </span>
+                    ))}
+                </div>
+            )}
         </section>
     )};
 
@@ -196,7 +205,7 @@ const ResumeRenderer = ({ data, layout, onEdit, isEditable }: { data: ResumeData
                                     {job.links.map((link, k) => (
                                         <div key={k} className="flex items-center gap-1 mb-1">
                                             <span className="font-semibold">Link:</span>
-                                            <a href={link} target="_blank" rel="noopener noreferrer" className="underline break-all hover:opacity-75" style={{ color: layout.type === 'sidebar-left' ? layout.colors.sidebarBg : layout.colors.primary }}>
+                                            <a href={link} target="_blank" rel="noopener noreferrer" className="bg-gradient-to-r from-current to-current bg-[length:100%_1px] bg-no-repeat bg-bottom pb-[2px] break-all hover:opacity-75 no-underline" style={{ color: layout.type === 'sidebar-left' ? layout.colors.sidebarBg : layout.colors.primary }}>
                                                 {link}
                                             </a>
                                         </div>
@@ -259,7 +268,7 @@ const ResumeRenderer = ({ data, layout, onEdit, isEditable }: { data: ResumeData
                             {proj.link && (
                                 <div className="flex items-center gap-1 text-xs opacity-80">
                                     <span className="font-semibold" style={{ color: layout.colors.text }}>Link:</span>
-                                    <a href={proj.link} target="_blank" rel="noopener noreferrer" className="underline break-all hover:opacity-75" style={{ color: layout.type === 'sidebar-left' ? layout.colors.sidebarBg : layout.colors.primary }}>
+                                    <a href={proj.link} target="_blank" rel="noopener noreferrer" className="bg-gradient-to-r from-current to-current bg-[length:100%_1px] bg-no-repeat bg-bottom pb-[2px] break-all hover:opacity-75 no-underline" style={{ color: layout.type === 'sidebar-left' ? layout.colors.sidebarBg : layout.colors.primary }}>
                                         {proj.link}
                                     </a>
                                 </div>
@@ -273,17 +282,26 @@ const ResumeRenderer = ({ data, layout, onEdit, isEditable }: { data: ResumeData
 
     const renderLanguages = () => {
         if (!data.languages || data.languages.length === 0) return null;
+
+        const isClassicLayout = ['executive-classic', 'elegant-serif'].includes(layout.id);
+
         return (
             <section className="mb-6">
                 <h2 className="text-sm font-bold uppercase tracking-widest border-b pb-1 mb-3" 
                     style={{ color: layout.type.includes('sidebar') ? (layout.colors.sidebarBg ? layout.colors.text : layout.colors.primary) : layout.colors.primary, borderColor: layout.colors.secondary }}>
                     Languages
                 </h2>
-                <div className="flex flex-wrap gap-2 text-sm">
-                    {data.languages.map((lang, i) => (
-                        <span key={i} className="font-medium px-2 py-1 rounded border opacity-80" style={{ borderColor: layout.colors.secondary, color: layout.colors.text }}>{lang}</span>
-                    ))}
-                </div>
+                {isClassicLayout ? (
+                    <div className="text-sm leading-relaxed font-medium" style={{ color: layout.colors.text }}>
+                        {data.languages.join("  •  ")}
+                    </div>
+                ) : (
+                    <div className="flex flex-wrap gap-2 text-sm">
+                        {data.languages.map((lang, i) => (
+                            <span key={i} className="inline-block font-medium px-2 h-[22px] leading-[22px] rounded border opacity-80 align-middle tracking-wide" style={{ borderColor: layout.colors.secondary, color: layout.colors.text }}>{lang}</span>
+                        ))}
+                    </div>
+                )}
             </section>
         );
     };
@@ -347,7 +365,7 @@ const ResumeRenderer = ({ data, layout, onEdit, isEditable }: { data: ResumeData
                     {data.header?.name || "Your Name"}
                 </h1>
                 <p className="text-xl font-medium mb-2 opacity-90" style={{ color: layout.colors.sidebarBg ? layout.colors.sidebarText : layout.colors.secondary }}>{data.header?.title || "Professional Title"}</p>
-                <div className={`font-medium opacity-75 ${layout.type === 'sidebar-left' ? 'flex flex-col gap-1 items-start mt-3 text-xs' : 'text-sm flex flex-wrap gap-3 items-center mt-2'}`} style={{ color: layout.colors.sidebarBg ? layout.colors.sidebarText : layout.colors.secondary }}>
+                <div className={`font-medium opacity-75 tracking-wide ${layout.type === 'sidebar-left' ? 'flex flex-col gap-1 items-start mt-3 text-xs' : 'text-sm flex flex-wrap gap-3 items-center mt-2'}`} style={{ color: layout.colors.sidebarBg ? layout.colors.sidebarText : layout.colors.secondary }}>
                     {layout.type !== 'sidebar-left' && <span>{data.header?.contact}</span>}
                     {data.header?.links && data.header.links.length > 0 && (
                         <>
@@ -394,7 +412,7 @@ const ResumeRenderer = ({ data, layout, onEdit, isEditable }: { data: ResumeData
                                         <h2 className="text-sm font-bold uppercase tracking-widest border-b pb-1 mb-3 opacity-70" style={{ borderColor: layout.colors.secondary }}>Skills</h2>
                                         <div className="flex flex-wrap gap-2">
                                             {validSkills.map((skill, i) => (
-                                                <span key={i} className="text-xs font-semibold block w-full">• {skill}</span>
+                                                <span key={i} className="text-xs font-semibold block w-full tracking-wide">• {skill}</span>
                                             ))}
                                         </div>
                                     </section>

@@ -87,7 +87,7 @@ export async function POST(req: Request) {
           "year": "Year"
         }
       ],
-      "projects": [ // VERY IMPORTANT: Extract ALL projects mentioned in the text.
+      "projects": [ // VERY IMPORTANT: Only extract if there is an explicit 'Projects' section in the source. Otherwise return [].
         {
           "name": "Project Name",
           "description": "Brief description of technologies and impact."
@@ -126,7 +126,9 @@ export async function POST(req: Request) {
     - CRITICAL: Preserve all Play Store / App Store / GitHub links found in job descriptions. Add them to the 'links' array for that experience.
     - CRITICAL: Order 'experience' items by date, starting with the MOST RECENT (Current/Present) job first, and working backwards. Do NOT return them in random or chronological order.
     - CRITICAL: YOU MUST INCLUDE EVERY SINGLE EXPERIENCE ITEM FOUND IN THE SOURCE TEXT. If the source lists 2 jobs, return 2 jobs. If it lists 3, return 3. Do NOT omit older jobs unless they are irrelevant >15 years ago.
-    - CRITICAL: EXTRACT 'PROJECTS' SECTION IF PRESENT. This includes 'Solo Projects', 'Side Projects', 'Technical Projects'. You MUST extract all items and place them in the 'projects' array. Do NOT skip them.
+    - CRITICAL: EXTRACT 'PROJECTS' SECTION ONLY IF EXPLICITLY PRESENT. This includes sections titled 'Projects', 'Solo Projects', 'Side Projects', or 'Technical Projects'.
+    - CRITICAL: IF NO EXPLICIT 'PROJECTS' SECTION EXISTS, RETURN AN EMPTY ARRAY '[]'. Do NOT convert 'Experience' items into 'Components' or 'Projects'.
+    - CRITICAL: Do NOT invent a projects section if the user didn't include one.
     - CRITICAL: If the user lists 'Solo Projects', treat them as full 'Projects'. Include name, description, and key tech stack.
     - CRITICAL: APPLY IMPROVEMENTS: If an 'Actionable Fix' or 'Weakness' critique specifically suggests a change (e.g. 'rephrase X as Y'), YOU MUST IMPLEMENT THAT CHANGE in the generated JSON content.
     - CRITICAL: DETERMINE SECTION ORDER. You must output a 'sectionOrder' array of strings.
