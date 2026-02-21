@@ -141,6 +141,7 @@ export async function POST(req: Request) {
       - Example 2 (Senior Dev): ["experience", "skills", "projects", "education", "languages"]
     - CRITICAL: 'languages' array MUST contain HUMAN SPOKEN LANGUAGES ONLY (e.g. English, Spanish, French).
     - CRITICAL: DO NOT put programming languages (Python, Java, C++, etc.) in 'languages'. Put them in 'skills'.
+    - CRITICAL: If you see links containing "idk" (e.g., github.com/idk, canva.com/design/idk), TREAT THEM AS NORMAL LINKS. Extract them exactly as written into the 'links' array. Do NOT skip or remove them.
     - Do NOT include markdown code blocks (like \`\`\`json). Just return the raw JSON string.
     `;
 
