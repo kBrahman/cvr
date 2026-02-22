@@ -99,7 +99,7 @@ export async function POST(req: Request) {
           "items": ["Achievement 1", "Achievement 2"]
         }
       ],
-      "publications": [ // IMPORTANT: If there are many, only list 3-5 'Selected Publications' or most recent/important ones.
+      "publications": [ // CRITICAL: return [] if there is no explicit 'Publications' or 'Bibliography' section in the source. Do not infer from achievements. If there are many, only list 3-5 'Selected Publications'.
         {
           "title": "Title of paper or book",
           "publisher": "Journal, Conference, or Publisher name",
@@ -144,7 +144,7 @@ export async function POST(req: Request) {
     - CRITICAL: IF NO EXPLICIT 'PROJECTS' SECTION EXISTS, RETURN AN EMPTY ARRAY '[]'. Do NOT convert 'Experience' items into 'Components' or 'Projects'.
     - CRITICAL: Do NOT invent a projects section if the user didn't include one.
     - CRITICAL: Only extract 'achievements' if there is an explicitly separated 'Achievements', 'Awards', 'Honors' or 'Competitions' section. Do NOT duplicate achievements that are already bullet points under 'experience' or 'education'.
-    - CRITICAL: If the user lists 'Publications' or 'Bibliography', extract them. IF THERE ARE MORE THAN 5, CONDENSE the list into the top 3-5 "Selected Publications" (most recent or most prominent). NEVER return a 3-page list. 
+    - CRITICAL: EXTRACT 'PUBLICATIONS' ONLY IF the source text explicitly contains a dedicated "Publications" or "Bibliography" section detailing concrete papers. IF NOT PRESENT, STRICTLY RETURN AN EMPTY ARRAY "[]" FOR PUBLICATIONS. DO NOT invent this section to extract a single related achievement bullet point. IF THERE ARE MORE THAN 5, CONDENSE the list into the top 3-5 "Selected Publications". NEVER return a 3-page list.
     - CRITICAL: If the user lists 'Solo Projects', treat them as full 'Projects'. Include name, description, and key tech stack.
     - CRITICAL: APPLY IMPROVEMENTS: If an 'Actionable Fix' or 'Weakness' critique specifically suggests a change (e.g. 'rephrase X as Y'), YOU MUST IMPLEMENT THAT CHANGE in the generated JSON content.
     - CRITICAL: DETERMINE SECTION ORDER. You must output a 'sectionOrder' array of strings.
@@ -168,6 +168,13 @@ export async function POST(req: Request) {
     text = text.replace(/```json/g, "").replace(/```/g, "").trim();
     
     const fixedContent = JSON.parse(text);
+
+    // Server-side safety enforcer: If no publications/bibliography mentioned in source text, clear out any hallucinated publications
+    if (fixedContent.publications && fixedContent.publications.length > 0) {
+      if (!/publications|bibliography/i.test(resumeText)) {
+        fixedContent.publications = [];
+      }
+    }
 
     return NextResponse.json({ fixedContent });
 

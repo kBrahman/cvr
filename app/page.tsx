@@ -94,7 +94,7 @@ export default async function Home() {
                   </div>
                 ))}
               </div>
-              <span className="ml-2">Trusted by {displayDownloads.toLocaleString()}+ job seekers</span>
+              <span className="ml-2">Trusted by {displayDownloads.toLocaleString()} job seekers</span>
             </div>
           </div>
         </div>
