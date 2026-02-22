@@ -33,6 +33,16 @@ interface ResumeData {
     description: string;
     link?: string;
   }[];
+  achievements?: {
+    category?: string;
+    items: string[];
+  }[];
+  publications?: {
+    title: string;
+    publisher: string;
+    year?: string;
+    link?: string;
+  }[];
   photo?: string;
   sectionOrder?: string[];
 }
@@ -280,6 +290,66 @@ const ResumeRenderer = ({ data, layout, onEdit, isEditable }: { data: ResumeData
         );
     };
 
+    const renderAchievements = () => {
+        if (!data.achievements || data.achievements.length === 0) return null;
+        return (
+            <section className="mb-6">
+                <h2 className="text-sm font-bold uppercase tracking-widest border-b pb-1 mb-3" 
+                    style={{ color: layout.type.includes('sidebar') ? (layout.colors.sidebarBg ? layout.colors.text : layout.colors.primary) : layout.colors.primary, borderColor: layout.colors.secondary }}>
+                    Achievements
+                </h2>
+                <div className="space-y-4">
+                    {data.achievements.map((achGroup, i) => (
+                        <div key={i} className="page-break-avoid">
+                            {achGroup.category && (
+                                <h3 className="font-bold text-sm mb-1" style={{ color: layout.colors.text }}>{achGroup.category}</h3>
+                            )}
+                            <div className="space-y-1 ml-1">
+                                {achGroup.items.map((item, j) => (
+                                    <div key={j} className="flex items-start text-sm" style={{ color: layout.colors.text }}>
+                                        <span className="mr-2 rounded-full flex-shrink-0" style={{ width: '5px', height: '5px', marginTop: '9px', backgroundColor: layout.colors.text, opacity: 0.7 }} />
+                                        <span className="flex-1 opacity-90">{item}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </section>
+        );
+    };
+
+    const renderPublications = () => {
+        if (!data.publications || data.publications.length === 0) return null;
+        return (
+            <section className="mb-6">
+                <h2 className="text-sm font-bold uppercase tracking-widest border-b pb-1 mb-3" 
+                    style={{ color: layout.type.includes('sidebar') ? (layout.colors.sidebarBg ? layout.colors.text : layout.colors.primary) : layout.colors.primary, borderColor: layout.colors.secondary }}>
+                    Selected Publications
+                </h2>
+                <div className="space-y-4">
+                    {data.publications.map((pub, i) => (
+                        <div key={i} className="page-break-avoid">
+                            <h3 className="font-bold text-sm mb-1" style={{ color: layout.colors.text }}>{pub.title}</h3>
+                            <div className="text-sm flex justify-between items-baseline mb-1">
+                                <span className="opacity-90 italic" style={{ color: layout.colors.text }}>{pub.publisher}</span>
+                                <span className="text-xs font-medium opacity-75" style={{ color: layout.colors.text }}>{pub.year}</span>
+                            </div>
+                            {pub.link && (
+                                <div className="flex items-center gap-1 text-xs opacity-80">
+                                    <span className="font-semibold" style={{ color: layout.colors.text }}>Link:</span>
+                                    <a href={pub.link} target="_blank" rel="noopener noreferrer" className="bg-gradient-to-r from-current to-current bg-[length:100%_1px] bg-no-repeat bg-bottom pb-[2px] break-all hover:opacity-75 no-underline" style={{ color: layout.type === 'sidebar-left' ? layout.colors.sidebarBg : layout.colors.primary }}>
+                                        {pub.link}
+                                    </a>
+                                </div>
+                            )}
+                        </div>
+                    ))}
+                </div>
+            </section>
+        );
+    };
+
     const renderLanguages = () => {
         if (!data.languages || data.languages.length === 0) return null;
 
@@ -475,6 +545,8 @@ const ResumeRenderer = ({ data, layout, onEdit, isEditable }: { data: ResumeData
 
                      {renderExperience()}
                      {renderProjects()}
+                     {renderAchievements()}
+                     {renderPublications()}
                 </div>
             </div>
         )
@@ -489,6 +561,8 @@ const ResumeRenderer = ({ data, layout, onEdit, isEditable }: { data: ResumeData
                      {renderSummary()}
                      {renderExperience()}
                      {renderProjects()}
+                     {renderAchievements()}
+                     {renderPublications()}
                 </div>
                  <div className="w-1/3 p-8 flex flex-col gap-6" style={{ backgroundColor: layout.colors.sidebarBg, color: layout.colors.sidebarText }}>
                       {layout.id === 'creative-mint' && photoUrl && (
@@ -565,14 +639,16 @@ const ResumeRenderer = ({ data, layout, onEdit, isEditable }: { data: ResumeData
 
     // Single Column
     const dynamicOrder = data.sectionOrder?.filter(key => 
-        ['experience', 'education', 'projects', 'skills', 'languages'].includes(key)
-    ) || ['skills', 'experience', 'projects', 'education', 'languages']; // Default fallback
+        ['experience', 'education', 'projects', 'achievements', 'publications', 'skills', 'languages'].includes(key)
+    ) || ['skills', 'experience', 'projects', 'achievements', 'publications', 'education', 'languages']; // Default fallback
 
     const renderSection = (key: string) => {
         switch(key) {
             case 'experience': return renderExperience();
             case 'education': return renderEducation();
             case 'projects': return renderProjects();
+            case 'achievements': return renderAchievements();
+            case 'publications': return renderPublications();
             case 'skills': return renderSkills();
             case 'languages': return renderLanguages();
             default: return null;
@@ -981,6 +1057,63 @@ export default function ProfessionalResume({ data, onDownload, price = "9.99" }:
                                             <span className="font-semibold text-gray-800" style={{ color: '#1f2937' }}>Link:</span>
                                             <a href={proj.link} target="_blank" rel="noopener noreferrer" className="underline break-all hover:text-blue-800" style={{ color: '#2563eb' }}>
                                                 {proj.link}
+                                            </a>
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                      </section>
+                    );
+                  })()}
+
+                  {(() => {
+                    if (!resumeData.achievements || resumeData.achievements.length === 0) return null;
+                    return (
+                      <section className="mb-6">
+                        <h2 className="text-sm font-bold uppercase tracking-widest text-gray-800 border-b border-gray-300 pb-1 mb-3" style={{ color: '#1f2937', borderColor: '#d1d5db' }}>Achievements</h2>
+                        <div className="space-y-4">
+                            {resumeData.achievements.map((achGroup, i) => (
+                                <div key={i} className="page-break-avoid">
+                                    {achGroup.category && (
+                                        <h3 className="font-bold text-sm text-gray-900 mb-1" style={{ color: '#111827' }}>{achGroup.category}</h3>
+                                    )}
+                                    <div className="space-y-1 ml-1">
+                                        {achGroup.items.map((item, j) => (
+                                            <div key={j} className="flex items-start text-sm text-gray-600" style={{ color: '#4b5563' }}>
+                                                <span 
+                                                    className="mr-2 rounded-full flex-shrink-0 bg-gray-600" 
+                                                    style={{ width: '5px', height: '5px', marginTop: '8px', backgroundColor: '#4b5563' }} 
+                                                />
+                                                <span className="flex-1 opacity-90">{item}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                      </section>
+                    );
+                  })()}
+
+                  {(() => {
+                    if (!resumeData.publications || resumeData.publications.length === 0) return null;
+                    return (
+                      <section className="mb-6 page-break-avoid">
+                        <h2 className="text-sm font-bold uppercase tracking-widest text-gray-800 border-b border-gray-300 pb-1 mb-3" style={{ color: '#1f2937', borderColor: '#d1d5db' }}>Selected Publications</h2>
+                        <div className="space-y-4">
+                            {resumeData.publications.map((pub, i) => (
+                                <div key={i} className="page-break-avoid">
+                                    <h3 className="font-bold text-gray-900 mb-1" style={{ color: '#111827' }}>{pub.title}</h3>
+                                    <div className="text-sm flex justify-between items-baseline mb-1">
+                                        <span className="text-gray-700 italic" style={{ color: '#374151' }}>{pub.publisher}</span>
+                                        <span className="text-xs font-medium text-gray-500" style={{ color: '#6b7280' }}>{pub.year}</span>
+                                    </div>
+                                    {pub.link && (
+                                        <div className="flex items-center gap-1 text-xs text-blue-600">
+                                            <span className="font-semibold text-gray-800" style={{ color: '#1f2937' }}>Link:</span>
+                                            <a href={pub.link} target="_blank" rel="noopener noreferrer" className="underline break-all hover:text-blue-800" style={{ color: '#2563eb' }}>
+                                                {pub.link}
                                             </a>
                                         </div>
                                     )}

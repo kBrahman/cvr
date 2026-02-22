@@ -92,6 +92,20 @@ export async function POST(req: Request) {
           "name": "Project Name",
           "description": "Brief description of technologies and impact."
         }
+      ],
+      "achievements": [ // Extract standalone Achievements, Awards, Honors, or Programming milestones outside of standard Experience
+        {
+          "category": "Category Name (or empty string if none)",
+          "items": ["Achievement 1", "Achievement 2"]
+        }
+      ],
+      "publications": [ // IMPORTANT: If there are many, only list 3-5 'Selected Publications' or most recent/important ones.
+        {
+          "title": "Title of paper or book",
+          "publisher": "Journal, Conference, or Publisher name",
+          "year": "Year",
+          "link": "https://..." // Link if available
+        }
       ]
     }
 
@@ -129,6 +143,8 @@ export async function POST(req: Request) {
     - CRITICAL: EXTRACT 'PROJECTS' SECTION ONLY IF EXPLICITLY PRESENT. This includes sections titled 'Projects', 'Solo Projects', 'Side Projects', or 'Technical Projects'.
     - CRITICAL: IF NO EXPLICIT 'PROJECTS' SECTION EXISTS, RETURN AN EMPTY ARRAY '[]'. Do NOT convert 'Experience' items into 'Components' or 'Projects'.
     - CRITICAL: Do NOT invent a projects section if the user didn't include one.
+    - CRITICAL: Only extract 'achievements' if there is an explicitly separated 'Achievements', 'Awards', 'Honors' or 'Competitions' section. Do NOT duplicate achievements that are already bullet points under 'experience' or 'education'.
+    - CRITICAL: If the user lists 'Publications' or 'Bibliography', extract them. IF THERE ARE MORE THAN 5, CONDENSE the list into the top 3-5 "Selected Publications" (most recent or most prominent). NEVER return a 3-page list. 
     - CRITICAL: If the user lists 'Solo Projects', treat them as full 'Projects'. Include name, description, and key tech stack.
     - CRITICAL: APPLY IMPROVEMENTS: If an 'Actionable Fix' or 'Weakness' critique specifically suggests a change (e.g. 'rephrase X as Y'), YOU MUST IMPLEMENT THAT CHANGE in the generated JSON content.
     - CRITICAL: DETERMINE SECTION ORDER. You must output a 'sectionOrder' array of strings.
@@ -136,9 +152,9 @@ export async function POST(req: Request) {
       - If the candidate is an EXPERIENCED professional (>2 years), put "experience" FIRST.
       - If the candidate relies on portfolios (e.g. designer/dev), put "projects" or "skills" higher.
       - The array must assume 'header' and 'summary' are already at the top.
-      - valid values: "experience", "education", "projects", "skills", "languages".
-      - Example 1 (Student): ["education", "skills", "projects", "experience", "languages"]
-      - Example 2 (Senior Dev): ["experience", "skills", "projects", "education", "languages"]
+      - valid values: "experience", "education", "projects", "skills", "languages", "achievements", "publications".
+      - Example 1 (Student): ["education", "skills", "projects", "achievements", "publications", "experience", "languages"]
+      - Example 2 (Senior Dev): ["experience", "skills", "projects", "achievements", "publications", "education", "languages"]
     - CRITICAL: 'languages' array MUST contain HUMAN SPOKEN LANGUAGES ONLY (e.g. English, Spanish, French).
     - CRITICAL: DO NOT put programming languages (Python, Java, C++, etc.) in 'languages'. Put them in 'skills'.
     - CRITICAL: If you see links containing "idk" (e.g., github.com/idk, canva.com/design/idk), TREAT THEM AS NORMAL LINKS. Extract them exactly as written into the 'links' array. Do NOT skip or remove them.

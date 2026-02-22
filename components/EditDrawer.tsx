@@ -31,6 +31,16 @@ interface ResumeData {
       name: string;
       description: string;
     }[];
+    achievements?: {
+      category?: string;
+      items: string[];
+    }[];
+    publications?: {
+      title: string;
+      publisher: string;
+      year?: string;
+      link?: string;
+    }[];
   }
 
 interface EditDrawerProps {
@@ -224,6 +234,12 @@ export default function EditDrawer({ isOpen, onClose, data, onUpdate }: EditDraw
                                         placeholder="Company"
                                      />
                                  </div>
+                                 <input 
+                                     value={exp.period || ''}
+                                     onChange={(e) => handleNestedChange('experience', i, 'period', e.target.value)}
+                                     className="w-full bg-zinc-900 border-zinc-700 rounded px-2 py-1 text-sm text-white"
+                                     placeholder="Period (e.g., 2020 - Present)"
+                                 />
                                  <textarea 
                                      value={exp.achievements.join('\n')}
                                      onChange={(e) => {
