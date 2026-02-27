@@ -1,8 +1,8 @@
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
 
-const PRIMARY_MODEL = "gemini-3-flash-preview"; 
+const PRIMARY_MODEL = "gemini-2.5-flash"; 
 const FALLBACK_MODEL = "gemini-2.5-pro";
-const LAST_RESORT_MODEL = "gemini-2.0-flash-lite"; 
+const LAST_RESORT_MODEL = "gemini-3-flash-preview"; 
 
 export async function generateWithFallback(
   genAI: GoogleGenerativeAI, 

@@ -54,6 +54,8 @@ export async function POST(req: Request): Promise<NextResponse> {
     CRITICAL INSTRUCTION: IGNORE all file encoding artifacts (RTF tags, XML structures, weird characters). Do NOT mention "RTF code", "XML junk", "raw internal formatting", or "ATS parsing issues due to file format" in the weaknesses. WEAKNESSES MUST BE ABOUT THE VISIBLE CONTENT (wording, layout choices, lack of metrics, bad grammar, etc). If the text looks messy due to extraction, assume it's a parsing artifact and judge the underlying content instead.
     
     CRITICAL INSTRUCTION: If you see links containing "idk" (e.g., github.com/idk, canva.com/design/idk), TREAT THEM AS TEMPLATE PLACEHOLDERS. Do NOT roast the candidate for having "idk" in their URL. Do NOT mention it in weaknesses.
+    
+    CRITICAL INSTRUCTION: If you want to suggest adding a "Tools & Technologies" section, use the term "CORE COMPETENCIES" instead. Do NOT suggest "Tools & Technologies".
 
     Output JSON format ONLY (no markdown backticks):
     {
