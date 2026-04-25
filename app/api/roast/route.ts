@@ -53,6 +53,12 @@ export async function POST(req: Request): Promise<NextResponse> {
     
     CRITICAL INSTRUCTION: IGNORE all file encoding artifacts (RTF tags, XML structures, weird characters). Do NOT mention "RTF code", "XML junk", "raw internal formatting", or "ATS parsing issues due to file format" in the weaknesses. WEAKNESSES MUST BE ABOUT THE VISIBLE CONTENT (wording, layout choices, lack of metrics, bad grammar, etc). If the text looks messy due to extraction, assume it's a parsing artifact and judge the underlying content instead.
     
+    CRITICAL GROUNDEDNESS: ONLY roast what is explicitly present in the document. Do NOT hallucinate sensitive information that is NOT there. Specifically:
+    - Do NOT claim the user shared their full street address unless you see a street number and name.
+    - Do NOT claim the user shared their date of birth unless you see a specific birthday.
+    - Do NOT claim the user shared their place of birth unless it's explicitly labeled as such.
+    - Base your "weaknesses" ONLY on the content you can actually see. If a common resume mistake (like over-sharing) is NOT present, do NOT include it as a weakness.
+    
     CRITICAL INSTRUCTION: If you see links containing "idk" (e.g., github.com/idk, canva.com/design/idk), TREAT THEM AS TEMPLATE PLACEHOLDERS. Do NOT roast the candidate for having "idk" in their URL. Do NOT mention it in weaknesses.
     
     CRITICAL INSTRUCTION: If you want to suggest adding a "Tools & Technologies" section, use the term "CORE COMPETENCIES" instead. Do NOT suggest "Tools & Technologies".
@@ -221,7 +227,7 @@ export async function POST(req: Request): Promise<NextResponse> {
             mimeType: fileType // Use the (potentially converted) MIME type
           }
         },
-        "TASK 1: DATA EXTRACTION (CRITICAL). You are acting as an OCR machine. extract ALL text from the image VERBATIM into the 'extracted_text' field. Do NOT summarize. Do NOT skip sections. You MUST include:\n- 'Experience' (ALL jobs)\n- 'Solo Projects', 'Side Projects', 'Projects' (ALL content including bullet points)\n- 'Education' (even if redacted)\n- 'Skills'\n\nTASK 2: ROAST THE RESUME.\nAnalyze the content you just extracted. ...\n\nNOTE: If you see large black bars/redacted regions, treat them as text content '[Redacted]'. ...\n\nALSO: Detect the candidate's profile photo..."
+        "TASK 1: DATA EXTRACTION (CRITICAL). You are acting as an OCR machine. extract ALL text from the image VERBATIM into the 'extracted_text' field. Do NOT summarize. Do NOT skip sections. You MUST include:\n- 'Experience' (ALL jobs)\n- 'Solo Projects', 'Side Projects', 'Projects' (ALL content including bullet points)\n- 'Education' (even if redacted)\n- 'Skills'\n\nTASK 2: ROAST THE RESUME.\nAnalyze the content you just extracted. BE BRUTAL but BE ACCURATE. Do NOT make up flaws that aren't there. If the user only provides a city (e.g. 'Atlanta'), that is NOT 'over-sharing a full address'. If there is no birth date, do NOT claim there is one.\n\nNOTE: If you see large black bars/redacted regions, treat them as text content '[Redacted]'. If a whole section is missing, roast them for the missing section instead of hallucinating content.\n\nALSO: Detect the candidate's profile photo if present..."
       ];
     } else {
       return NextResponse.json({ error: "Unsupported file type" }, { status: 400 });
@@ -239,12 +245,56 @@ export async function POST(req: Request): Promise<NextResponse> {
     // Clean up markdown code blocks if present
     text = text.replace(/```json/g, "").replace(/```/g, "").trim();
     
-    const jsonResponse = JSON.parse(text);
+    let jsonResponse = JSON.parse(text);
     
     // Use extracted text from Gemini if valid (for images)
     if (!resumeText && jsonResponse.extracted_text) {
         resumeText = jsonResponse.extracted_text;
     }
+
+    // --- SAFETY MECHANISM: Hallucination Filter ---
+    // Some models hallucinate that "Address" or "Date of Birth" is present as a generic roast point.
+    // We cross-reference weaknesses against the actual extracted text.
+    if (jsonResponse.weaknesses && Array.isArray(jsonResponse.weaknesses)) {
+        const piiHallucinations = [
+            { 
+                trigger: ["date of birth", "birth date", "dob", "born on"], 
+                check: (text: string) => {
+                    const hasFullDate = /\b(january|february|march|april|may|june|july|august|september|october|november|december)\s+\d{1,2},?\s+\d{4}\b/i.test(text);
+                    const hasBirthKeyword = /birth|born|d\.o\.b/i.test(text);
+                    return !(hasFullDate || hasBirthKeyword);
+                }
+            },
+            { 
+                trigger: ["full address", "street address", "home address", "residential address"], 
+                check: (text: string) => {
+                    // Simple check: does it look like a street address? (e.g. 123 Main St)
+                    const hasStreetNumber = /\d{1,5}\s+[A-Z][a-z]+/.test(text);
+                    const hasStreetType = /\b(st|street|ave|avenue|rd|road|blvd|lane|ln|drive|dr)\b/i.test(text);
+                    return !(hasStreetNumber && hasStreetType);
+                }
+            },
+            {
+                trigger: ["place of birth", "born in"],
+                check: (text: string) => !/born in|place of birth/i.test(text)
+            }
+        ];
+
+        jsonResponse.weaknesses = jsonResponse.weaknesses.filter((weakness: string) => {
+            const lowerW = weakness.toLowerCase();
+            for (const h of piiHallucinations) {
+                if (h.trigger.some(t => lowerW.includes(t))) {
+                    // If the weakness mentions this PII, but it's not clearly in the text, filter it out.
+                    if (h.check(resumeText || "")) {
+                        console.log(`[Safety] Filtering hallucinated weakness: "${weakness}"`);
+                        return false;
+                    }
+                }
+            }
+            return true;
+        });
+    }
+    // ----------------------------------------------
 
     // Save Roast & Track Usage
     let roastId = null;
