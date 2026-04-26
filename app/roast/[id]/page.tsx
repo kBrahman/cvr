@@ -53,7 +53,11 @@ export async function generateMetadata(
     robots: {
       index: false,
       follow: false,
-    }
+    },
+    itunes: {
+      appId: '',
+      appArgument: `https://cv.brahman.top/roast/${id}`,
+    },
   }
 }
 

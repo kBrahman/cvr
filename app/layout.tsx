@@ -57,6 +57,10 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
+  itunes: {
+    appId: '6763504265',
+    appArgument: 'https://cv.brahman.top',
+  },
 };
 
 export default function RootLayout({

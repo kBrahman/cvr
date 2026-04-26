@@ -1,0 +1,15 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": [ "R92JQN9YTV.top.brahman.cv.CVR" ],
+        "components": [
+          {
+            "/": "/roast/*",
+            "comment": "Matches any link with a roast ID"
+          }
+        ]
+      }
+    ]
+  }
+}
