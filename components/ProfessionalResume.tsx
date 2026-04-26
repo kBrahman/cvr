@@ -785,7 +785,9 @@ export default function ProfessionalResume({ data, onDownload, price = "9.99" }:
     const element = targetRef?.current || resumeRef.current;
     if (!element) return;
 
-    if (!isPaid) {
+    const isLocal = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+
+    if (!isPaid && !isLocal) {
         // @ts-ignore
         setPendingDownload({ ref: { current: element }, filename: suffix });
         setShowPaymentModal(true);
@@ -1162,7 +1164,9 @@ export default function ProfessionalResume({ data, onDownload, price = "9.99" }:
                     <ArrowRight className="w-5 h-5" />
                  </button>
                  <p className="mt-4 text-xs text-zinc-500">
-                    One-time payment of ${price}. Secure checkout via PayPal.
+                    {typeof window !== 'undefined' && window.location.hostname === 'localhost' 
+                      ? "Local Development Mode: Payment Bypassed" 
+                      : `One-time payment of $${price}. Secure checkout via PayPal.`}
                  </p>
             </div>
         </div>

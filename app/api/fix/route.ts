@@ -129,7 +129,8 @@ export async function POST(req: Request) {
     IMPORTANT: 
     - Fix all grammar and spelling errors.
     - Use strong action verbs.
-    - CRITICAL: Do NOT invent, hallucinate, or infer ANY contact details. Only use contact info explicitly present in the source text.
+    - CRITICAL: Do NOT invent, hallucinate, or infer ANY contact details (Phone, Email, LinkedIn, GitHub, etc.). ONLY use contact info explicitly present in the source text.
+    - STRICTLY FORBIDDEN: Do NOT create "guessed" social media links based on the candidate's name (e.g., linkedin.com/in/fullname). If it's not in the text, it's not in the JSON.
     - CRITICAL: If multiple email addresses or phone numbers are present, INCLUDE ALL OF THEM (separated by ' / ' or ' | '). Do not arbitrarily select just one.
     - CRITICAL: In 'header.links', INCLUDE ONLY:
       1. Known professional profiles: GitHub, LinkedIn, Stack Overflow, Kaggle, GitLab.
@@ -177,6 +178,26 @@ export async function POST(req: Request) {
       if (!/publications|bibliography/i.test(resumeText)) {
         fixedContent.publications = [];
       }
+    }
+
+    // Safety Enforcer 2: Filter out hallucinated social links
+    if (fixedContent.header?.links && Array.isArray(fixedContent.header.links)) {
+        fixedContent.header.links = fixedContent.header.links.filter((link: any) => {
+            if (!link.url) return false;
+            // Extract the core part of the URL to check for its existence in source text
+            // e.g., for "linkedin.com/in/user", check if "user" or "linkedin.com/in/user" is in the text
+            const cleanUrl = link.url.replace(/^https?:\/\/(www\.)?/, '').toLowerCase();
+            const urlPath = cleanUrl.split('/').pop() || "";
+            
+            // Allow if the full URL or at least the username/handle is in the text
+            const inSource = resumeText.toLowerCase().includes(cleanUrl) || 
+                           (urlPath.length > 3 && resumeText.toLowerCase().includes(urlPath.toLowerCase()));
+            
+            if (!inSource) {
+                console.log(`[Safety] Filtering hallucinated link: ${link.url}`);
+            }
+            return inSource;
+        });
     }
 
     return NextResponse.json({ fixedContent });
