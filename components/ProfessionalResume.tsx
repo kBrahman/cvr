@@ -19,6 +19,7 @@ interface ResumeData {
   experience: {
     role: string;
     company: string;
+    location?: string;
     period: string;
     achievements: string[];
     links?: string[];
@@ -26,6 +27,7 @@ interface ResumeData {
   education: {
     degree: string;
     school: string;
+    location?: string;
     year: string;
   }[];
   projects?: {
@@ -202,7 +204,10 @@ const ResumeRenderer = ({ data, layout, onEdit, isEditable }: { data: ResumeData
                             <h3 className="font-bold" style={{ color: layout.colors.text }}>{job.role}</h3>
                             <span className="text-xs font-medium opacity-75" style={{ color: layout.colors.text }}>{job.period}</span>
                         </div>
-                        <div className="text-sm font-medium mb-2 opacity-90" style={{ color: layout.colors.text }}>{job.company}</div>
+                        <div className="text-sm font-medium mb-2 opacity-90" style={{ color: layout.colors.text }}>
+                            {job.company}
+                            {job.location && <span className="opacity-70 font-normal"> • {job.location}</span>}
+                        </div>
                          <div className="space-y-1 ml-1">
                             {job.achievements?.map((ach, j) => (
                                 <div key={j} className="flex items-start text-sm" style={{ color: layout.colors.text }}>
@@ -250,7 +255,10 @@ const ResumeRenderer = ({ data, layout, onEdit, isEditable }: { data: ResumeData
                 {validEducation.map((edu, i) => (
                     <div key={i} className="flex justify-between items-baseline page-break-avoid">
                         <div>
-                            <h3 className="font-bold" style={{ color: layout.colors.text }}>{edu.school}</h3>
+                            <h3 className="font-bold" style={{ color: layout.colors.text }}>
+                                {edu.school}
+                                {edu.location && <span className="text-xs opacity-70 font-normal ml-2">({edu.location})</span>}
+                            </h3>
                             <p className="text-sm opacity-90" style={{ color: layout.colors.text }}>{edu.degree}</p>
                         </div>
                         <span className="text-xs font-medium opacity-75" style={{ color: layout.colors.text }}>{edu.year}</span>
@@ -978,7 +986,10 @@ export default function ProfessionalResume({ data, onDownload, price = "9.99" }:
                                         <h3 className="font-bold text-gray-900" style={{ color: '#111827' }}>{job.role}</h3>
                                         <span className="text-xs font-medium text-gray-500" style={{ color: '#6b7280' }}>{job.period}</span>
                                     </div>
-                                    <div className="text-sm font-medium text-gray-700 mb-2" style={{ color: '#374151' }}>{job.company}</div>
+                                    <div className="text-sm font-medium text-gray-700 mb-2" style={{ color: '#374151' }}>
+                                        {job.company}
+                                        {job.location && <span className="opacity-70 font-normal"> • {job.location}</span>}
+                                    </div>
                                     <div className="space-y-1 ml-1">
                                         {job.achievements?.map((ach, j) => (
                                             <div key={j} className="flex items-start text-sm text-gray-600" style={{ color: '#4b5563' }}>
@@ -1031,7 +1042,10 @@ export default function ProfessionalResume({ data, onDownload, price = "9.99" }:
                             {validEducation.map((edu, i) => (
                                 <div key={i} className="flex justify-between items-baseline page-break-avoid">
                                     <div>
-                                        <h3 className="font-bold text-gray-900" style={{ color: '#111827' }}>{edu.school}</h3>
+                                        <h3 className="font-bold text-gray-900" style={{ color: '#111827' }}>
+                                            {edu.school}
+                                            {edu.location && <span className="text-xs opacity-70 font-normal ml-2">({edu.location})</span>}
+                                        </h3>
                                         <p className="text-sm text-gray-600" style={{ color: '#4b5563' }}>{edu.degree}</p>
                                     </div>
                                     <span className="text-xs font-medium text-gray-500" style={{ color: '#6b7280' }}>{edu.year}</span>

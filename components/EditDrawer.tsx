@@ -18,12 +18,14 @@ interface ResumeData {
     experience: {
       role: string;
       company: string;
+      location?: string;
       period: string;
       achievements: string[];
     }[];
     education: {
       degree: string;
       school: string;
+      location?: string;
       year: string;
       achievements?: string[]; // Made optional to fit standard
     }[];
@@ -234,12 +236,20 @@ export default function EditDrawer({ isOpen, onClose, data, onUpdate }: EditDraw
                                         placeholder="Company"
                                      />
                                  </div>
-                                 <input 
-                                     value={exp.period || ''}
-                                     onChange={(e) => handleNestedChange('experience', i, 'period', e.target.value)}
-                                     className="w-full bg-zinc-900 border-zinc-700 rounded px-2 py-1 text-sm text-white"
-                                     placeholder="Period (e.g., 2020 - Present)"
-                                 />
+                                 <div className="grid grid-cols-2 gap-2">
+                                     <input 
+                                         value={exp.location || ''}
+                                         onChange={(e) => handleNestedChange('experience', i, 'location', e.target.value)}
+                                         className="bg-zinc-900 border-zinc-700 rounded px-2 py-1 text-sm text-white"
+                                         placeholder="Location (City, State)"
+                                     />
+                                     <input 
+                                         value={exp.period || ''}
+                                         onChange={(e) => handleNestedChange('experience', i, 'period', e.target.value)}
+                                         className="w-full bg-zinc-900 border-zinc-700 rounded px-2 py-1 text-sm text-white"
+                                         placeholder="Period (e.g., 2020 - Present)"
+                                     />
+                                 </div>
                                  <textarea 
                                      value={exp.achievements.join('\n')}
                                      onChange={(e) => {
@@ -279,12 +289,20 @@ export default function EditDrawer({ isOpen, onClose, data, onUpdate }: EditDraw
                                         placeholder="School"
                                      />
                                  </div>
-                                  <input 
-                                    value={edu.year}
-                                    onChange={(e) => handleNestedChange('education', i, 'year', e.target.value)}
-                                    className="w-full bg-zinc-900 border-zinc-700 rounded px-2 py-1 text-sm text-white"
-                                    placeholder="Year"
-                                 />
+                                 <div className="grid grid-cols-2 gap-2">
+                                     <input 
+                                         value={edu.location || ''}
+                                         onChange={(e) => handleNestedChange('education', i, 'location', e.target.value)}
+                                         className="w-full bg-zinc-900 border-zinc-700 rounded px-2 py-1 text-sm text-white"
+                                         placeholder="Location"
+                                     />
+                                     <input 
+                                         value={edu.year}
+                                         onChange={(e) => handleNestedChange('education', i, 'year', e.target.value)}
+                                         className="w-full bg-zinc-900 border-zinc-700 rounded px-2 py-1 text-sm text-white"
+                                         placeholder="Year"
+                                     />
+                                 </div>
                              </div>
                          ))}
                     </div>

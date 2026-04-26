@@ -75,6 +75,7 @@ export async function POST(req: Request) {
         {
           "role": "Job Title",
           "company": "Company Name",
+          "location": "City, State/Country",
           "period": "Dates",
           "achievements": ["Strong action verb + result", "Achievement 2", ...],
           "links": ["https://play.google.com/store/...", "https://apps.apple.com/..."] // ONLY if present
@@ -84,6 +85,7 @@ export async function POST(req: Request) {
         {
           "degree": "Degree Name",
           "school": "University Name",
+          "location": "City, State",
           "year": "Year"
         }
       ],
@@ -140,6 +142,7 @@ export async function POST(req: Request) {
     - CRITICAL: Preserve all Play Store / App Store / GitHub links found in job descriptions. Add them to the 'links' array for that experience.
     - CRITICAL: Order 'experience' items by date, starting with the MOST RECENT (Current/Present) job first, and working backwards. Do NOT return them in random or chronological order.
     - CRITICAL: YOU MUST INCLUDE EVERY SINGLE EXPERIENCE ITEM FOUND IN THE SOURCE TEXT. If the source lists 2 jobs, return 2 jobs. If it lists 3, return 3. Do NOT omit older jobs unless they are irrelevant >15 years ago.
+    - CRITICAL: EXTRACT AND PRESERVE LOCATION (City, State) for every job and school if present. Do not omit it.
     - CRITICAL: EXTRACT 'PROJECTS' SECTION ONLY IF EXPLICITLY PRESENT. This includes sections titled 'Projects', 'Solo Projects', 'Side Projects', or 'Technical Projects'.
     - CRITICAL: IF NO EXPLICIT 'PROJECTS' SECTION EXISTS, RETURN AN EMPTY ARRAY '[]'. Do NOT convert 'Experience' items into 'Components' or 'Projects'.
     - CRITICAL: Do NOT invent a projects section if the user didn't include one.
