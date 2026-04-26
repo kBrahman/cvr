@@ -486,7 +486,7 @@ const ResumeRenderer = ({ data, layout, onEdit, isEditable }: { data: ResumeData
                            const validSkills = data.skills?.filter(s => s && s.trim().length > 0 && s !== "Skill 1");
                            if (validSkills && validSkills.length > 0) {
                                return (
-                                   <section className="mb-6 page-break-avoid">
+                                   <section className="mb-6">
                                         <h2 className="text-sm font-bold uppercase tracking-widest border-b pb-1 mb-3 opacity-70" style={{ borderColor: layout.colors.secondary }}>Skills</h2>
                                         <div className="flex flex-wrap gap-2">
                                             {validSkills.map((skill, i) => (
@@ -503,7 +503,7 @@ const ResumeRenderer = ({ data, layout, onEdit, isEditable }: { data: ResumeData
                        {(() => {
                            if (data.languages && data.languages.length > 0) {
                                return (
-                                   <section className="mb-6 page-break-avoid">
+                                   <section className="mb-6">
                                         <h2 className="text-sm font-bold uppercase tracking-widest border-b pb-1 mb-3 opacity-70" style={{ borderColor: layout.colors.secondary }}>Languages</h2>
                                         <div className="flex flex-wrap gap-2">
                                             {data.languages.map((lang, i) => (
@@ -584,7 +584,7 @@ const ResumeRenderer = ({ data, layout, onEdit, isEditable }: { data: ResumeData
                                const validSkills = data.skills?.filter(s => s && s.trim().length > 0 && s !== "Skill 1");
                                if (validSkills && validSkills.length > 0) {
                                    return (
-                                       <section className="mb-6 page-break-avoid">
+                                       <section className="mb-6">
                                             <h2 className="text-sm font-bold uppercase tracking-widest border-b pb-1 mb-3 opacity-70" style={{ borderColor: layout.colors.secondary }}>Skills</h2>
                                             <div className="flex flex-wrap gap-2">
                                                 {validSkills.map((skill, i) => (
@@ -601,7 +601,7 @@ const ResumeRenderer = ({ data, layout, onEdit, isEditable }: { data: ResumeData
                            {(() => {
                                if (data.languages && data.languages.length > 0) {
                                    return (
-                                       <section className="mb-6 page-break-avoid">
+                                       <section className="mb-6">
                                             <h2 className="text-sm font-bold uppercase tracking-widest border-b pb-1 mb-3 opacity-70" style={{ borderColor: layout.colors.secondary }}>Languages</h2>
                                             <div className="flex flex-wrap gap-2">
                                                 {data.languages.map((lang, i) => (
@@ -625,7 +625,7 @@ const ResumeRenderer = ({ data, layout, onEdit, isEditable }: { data: ResumeData
                                 );
                                 if (validEducation && validEducation.length > 0) {
                                     return (
-                                       <section className="mb-6 page-break-avoid">
+                                       <section className="mb-6">
                                             <h2 className="text-sm font-bold uppercase tracking-widest border-b pb-1 mb-3 opacity-70" style={{ borderColor: layout.colors.secondary }}>Education</h2>
                                             {validEducation.map((edu, i) => (
                                                 <div key={i} className="mb-4 page-break-avoid">
