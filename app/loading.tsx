@@ -7,7 +7,7 @@ export default function Loading() {
         <div className="relative w-24 h-24 animate-pulse">
            <img 
              src="/favicon.ico" 
-             alt="ResumeRoast" 
+             alt="CVR" 
              className="w-full h-full object-contain drop-shadow-[0_0_20px_rgba(139,92,246,0.3)]"
            />
         </div>

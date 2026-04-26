@@ -1,7 +1,7 @@
 import Image from "next/image";
 import packageInfo from "@/package.json";
 
-import ResumeRoaster from "@/components/ResumeRoaster";
+import CVR from "@/components/ResumeRoaster";
 import Navbar from "@/components/Navbar";
 import MobileWarning from "@/components/MobileWarning";
 import { MoveRight, Zap, Shield, Search, CheckCircle2 } from "lucide-react";
@@ -102,7 +102,7 @@ export default async function Home() {
 
       {/* Roaster Component */}
       <section id="roast-section" className="px-6 pb-32 scroll-mt-24">
-        <ResumeRoaster price={price} />
+        <CVR price={price} />
       </section>
 
       {/* Social Proof */}
@@ -227,7 +227,7 @@ export default async function Home() {
 
       {/* Footer */}
       <footer className="border-t border-zinc-900 py-12 px-6 bg-black text-center text-zinc-500 text-sm">
-        <p>&copy; 2026 ResumeRoast v{packageInfo.version}. All rights reserved.</p>
+        <p>&copy; 2026 CVR v{packageInfo.version}. All rights reserved.</p>
       </footer>
     </main>
   );

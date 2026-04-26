@@ -14,7 +14,7 @@ function cn(...inputs: (string | undefined | null | false)[]) {
   return twMerge(clsx(inputs));
 }
 
-export default function ResumeRoaster({ price = "9.99" }: { price?: string }) {
+export default function CVR({ price = "9.99" }: { price?: string }) {
   const [file, setFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [loading, setLoading] = useState(false);

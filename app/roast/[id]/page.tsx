@@ -32,22 +32,22 @@ export async function generateMetadata(
 
   if (!roast) {
     return {
-      title: 'Roast Not Found - Resume Roaster'
+      title: 'Roast Not Found - CVR'
     }
   }
 
   return {
-    title: `Roasted! Score: ${roast.score}/100 - Resume Roaster`,
-    description: `My resume got a score of ${roast.score}/100 on Resume Roaster. "${roast.summary.substring(0, 100)}..."`,
+    title: `Roasted! Score: ${roast.score}/100 - CVR`,
+    description: `My resume got a score of ${roast.score}/100 on CVR. "${roast.summary.substring(0, 100)}..."`,
     openGraph: {
-      title: `Resume Roast Score: ${roast.score}/100`,
+      title: `CVR Score: ${roast.score}/100`,
       description: roast.summary,
-      url: `https://resumeroaster.app/roast/${id}`, // Example URL
+      url: `https://cvr.app/roast/${id}`, // Example URL
       type: 'website',
     },
     twitter: {
       card: 'summary_large_image',
-      title: `Resume Roast Score: ${roast.score}/100`,
+      title: `CVR Score: ${roast.score}/100`,
       description: roast.summary,
     },
     robots: {
@@ -94,7 +94,7 @@ export default async function SharedRoastPage({ params }: Props) {
           <Link href="/" className="flex items-center gap-2 font-bold text-xl hover:opacity-80 transition-opacity">
             <span className="text-2xl">🔥</span>
             <span className="bg-gradient-to-r from-orange-400 to-red-600 bg-clip-text text-transparent">
-              Resume Roaster
+              CVR
             </span>
           </Link>
           <Link 
