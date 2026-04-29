@@ -230,6 +230,7 @@ export default async function Home() {
       <footer className="border-t border-zinc-900 py-12 px-6 bg-black text-center text-zinc-500 text-sm">
         <div className="flex justify-center gap-6 mb-4 font-medium">
           <Link href="/privacy" className="hover:text-zinc-300 transition-colors">Privacy Policy</Link>
+          <Link href="/tos" className="hover:text-zinc-300 transition-colors">Terms of Service</Link>
         </div>
         <p>&copy; 2026 CVR v{packageInfo.version}. All rights reserved.</p>
       </footer>
